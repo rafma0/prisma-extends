@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Color {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique
+  slug      String    @unique
+  packages  Package[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model PackageSupplier {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique
+  slug      String    @unique
+  packages  Package[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model PackageNature {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique
+  slug      String    @unique
+  packages  Package[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Package {
+  id         String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nickname   String?
+  image      String?
+  width      Float
+  length     Float
+  height     Float
+  weight     Float
+  volume     String
+  suppliers  PackageSupplier[]
+  products   Product[]
+  color      Color             @relation(fields: [colorId], references: [id])
+  colorId    String            @db.Uuid
+  nature     PackageNature     @relation(fields: [natureId], references: [id])
+  natureId   String            @db.Uuid
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+model ProductNature {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nickname    String?
+  image       String?
+  description String?
+  composition String?
+  price       Float
+  volume      String
+  showTo      ProductShowTo
+  usage       ProductUsage
+  steps       ProductSteps[]
+  package     Package          @relation(fields: [packageId], references: [id])
+  packageId   String           @db.Uuid
+  nature      ProductNature    @relation(fields: [natureId], references: [id])
+  natureId    String           @db.Uuid
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum ProductShowTo {
+  ANY
+  CFO
+  CFM
+}
+
+enum ProductUsage {
+  PROFESSIONAL
+  HOMECARE
+}
+
+enum ProductSteps {
+  PREPARE
+  PEELING
+  POSTPEELING
+  MAINTENANCE
+}
